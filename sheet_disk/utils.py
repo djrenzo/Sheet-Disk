@@ -182,7 +182,13 @@ def worker_download(thread_no, start, end, thread_details):
     name = threading.current_thread().name
 
     logger.debug(name + ': Starting download')
-    t_cells = wks.range('A' + str(start) + ':A' + str(end))
+    try:
+      t_cells = wks.range('A' + str(start) + ':A' + str(end))
+    except gspread.exceptions.APIError:
+      logger.debug('API ERROR, WAITING')
+      time.sleep(60)
+      t_cells = wks.range('A' + str(start) + ':A' + str(end))
+    
     logger.debug(name + ': done download')
 
     with data_lock:
