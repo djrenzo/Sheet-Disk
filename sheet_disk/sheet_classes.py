@@ -4,6 +4,7 @@ to and from Google Sheets'''
 import os, sys, json
 from functools import partial
 import base64
+from time import sleep
 from .my_logging import get_logger, MyConsoleHandler
 from .__version__ import __version__
 from .utils import (
@@ -179,6 +180,10 @@ class SheetUpload:
                 logger.info('Skipping sheet ' + str(sheet_no))
                 continue
 
+            if sheet_no % 2 == 0:
+              logger.info("Waiting 5 for API")
+              sleep(5)
+
             # Create a sheet for file
             logger.debug('Creating sheet ' + str(sheet_no) + '/' + str(self.n_sheets) + '...')
             sh = self.gc.create(self.name + ' ' + str(sheet_no) + ' ' + right_now())
@@ -206,7 +211,7 @@ class SheetUpload:
 class SheetDownload:
     def __init__(self, client, download_path, json_dict):
 
-        logger.debug('SheetDownload init start')
+        logger.debug('SheetDownload init start --DIDI')
 
         if not json_dict['complete_upload']:
             # Stop download if file isn't originally uploaded completely
@@ -374,6 +379,10 @@ class SheetDownload:
                 logger.info('Sheet ' + str(sheet_no) + ' has already been downloaded!')
                 logger.info('Skipping sheet ' + str(sheet_no) + '/' + str(self.n_sheets))
                 continue
+
+            if sheet_no % 5 == 0:
+              logger.info("Waiting 60 seconds for API Restrictions")
+              sleep(60)
 
             logger.debug('Open sheet ' + str(sheet_no))
             sh = self.gc.open_by_key(key)
