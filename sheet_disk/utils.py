@@ -2,6 +2,7 @@
 functions that are needed to access google sheets'''
 
 import threading, time
+import gspread
 from queue import Queue, Empty as queueEmpty
 from .my_logging import MyConsoleHandler, get_logger
 logger = get_logger()
@@ -97,7 +98,13 @@ def worker_upload(cell_list, thread_details):
     name = threading.current_thread().name
 
     logger.debug(name + ': Starting upload')
-    wks.update_cells(cell_list)
+    try:
+      wks.update_cells(cell_list)
+    except gspread.exceptions.APIError:
+      logger.debug("API ERROR: WAITING 30 SECONDS")
+      time.sleep(30)
+      wks.update_cells(cell_list)
+
     logger.debug(name + ': Done upload')
 
     total_cells_done = len(cell_list)
